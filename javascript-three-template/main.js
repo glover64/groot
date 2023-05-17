@@ -1,9 +1,12 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { DragControls } from 'three/examples/jsm/controls/DragControls'
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color( 0xffffff );
+scene.add(new THREE.AxesHelper(100));
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+camera.position.z = 5;
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -17,41 +20,20 @@ const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 const cube = new THREE.Mesh( geometry, material );
 scene.add( cube );
 
-document.addEventListener( 'mousewheel', (event) => {
-    camera.position.z +=event.deltaY/500;
-});
+const orbitControls  = new OrbitControls( camera, renderer.domElement );
+const dragControls = new DragControls([], camera, renderer.domElement)
 
-document.addEventListener("keydown", function(event) {
-		console.log(event.code);
-		switch(event.code) {
-			case 'ArrowUp':
-				camera.position.y += 0.1;
-				break;
-			case 'ArrowDown':
-				camera.position.y -= 0.1;
-				break;
-			case 'ArrowLeft':
-				camera.position.x -= 0.1;
-				break;
-			case 'ArrowRight':
-				camera.position.x += 0.1;
-				break;
-		}
-  })
-
-document.addEventListener('mousedown', (event) => {
-	controls.update();
+dragControls.addEventListener('dragstart', function (event) {
+    orbitControls.enabled = false
+    event.object.material.opacity = 0.33
+})
+dragControls.addEventListener('dragend', function (event) {
+    orbitControls.enabled = true
+    event.object.material.opacity = 1
 })
 
-const controls = new OrbitControls( camera, renderer.domElement );
-
-camera.position.z = 5;
 function animate() {
 	requestAnimationFrame( animate );
 	renderer.render( scene, camera );
-	// geometry.rotateX(0.01) 
-	// geometry.rotateY(0.01)
-	// geometry.rotateX += 0.1
-	// geometry.rotateZ += 0.1
 }
 animate();
